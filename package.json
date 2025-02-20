@@ -1,0 +1,62 @@
+{
+  "devDependencies": {
+    "@babel/core": "^7.26.9",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.26.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/jest": "^29.5.14",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "babel-jest": "^29.7.0",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.3",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.7.3",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "name": "pencraft-editor",
+  "version": "1.0.0",
+  "description": "A lightweight and extensible WYSIWYG editor for React",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "prepublishOnly": "npm run test && npm run build",
+    "start": "webpack serve --mode development",
+    "dev": "webpack serve --mode development",
+    "build:example": "webpack --mode production"
+  },
+  "keywords": [
+    "react",
+    "editor",
+    "wysiwyg",
+    "rich-text",
+    "typescript"
+  ],
+  "author": "Yura Havrylyshyn",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  }
+}

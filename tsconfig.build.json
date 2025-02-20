@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "src/**/*.test.tsx",
+    "src/**/*.test.ts",
+    "src/**/*.spec.tsx",
+    "src/**/*.spec.ts",
+    "src/__tests__",
+    "src/setupTests.ts",
+    "src/example"
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "declaration": true
+  }
+} 
