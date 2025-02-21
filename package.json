@@ -28,7 +28,7 @@
     "react-dom": "^18.0.0"
   },
   "name": "pencraft-editor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A lightweight and extensible WYSIWYG editor for React",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
