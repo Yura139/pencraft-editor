@@ -2,20 +2,17 @@ const path = require("path")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = {
-  entry: "./src/index.tsx",
+  entry: "./src/example/App.tsx",
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "pencraft.js",
-    library: "Pencraft",
-    libraryTarget: "umd",
-    clean: true,
-    publicPath: process.env.NODE_ENV === "production" ? "/pencraft-editor/" : "/",
+    filename: "bundle.js",
+    publicPath: "/pencraft-editor/",
   },
   module: {
     rules: [
       {
         test: /\.(ts|tsx)$/,
-        use: "ts-loader",
+        use: "babel-loader",
         exclude: /node_modules/,
       },
       {
@@ -29,7 +26,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "public/index.html",
+      template: "./public/index.html",
+      filename: "index.html",
     }),
   ],
   devServer: {

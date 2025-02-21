@@ -24,8 +24,8 @@
     "webpack-dev-server": "^5.2.0"
   },
   "dependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "name": "pencraft-editor",
   "version": "1.0.1",
@@ -57,8 +57,8 @@
   "author": "Yura Havrylyshyn",
   "license": "MIT",
   "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
   },
   "repository": {
     "type": "git",
