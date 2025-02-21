@@ -9,6 +9,7 @@ module.exports = {
     library: "Pencraft",
     libraryTarget: "umd",
     clean: true,
+    publicPath: process.env.NODE_ENV === "production" ? "/pencraft-editor/" : "/",
   },
   module: {
     rules: [

@@ -58,5 +58,10 @@
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yura139/pencraft-editor.git"
+  },
+  "homepage": "https://yura139.github.io/pencraft-editor"
 }
