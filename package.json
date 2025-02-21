@@ -28,7 +28,7 @@
     "react-dom": "^18.0.0"
   },
   "name": "pencraft-editor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lightweight and extensible WYSIWYG editor for React",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,13 +38,14 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "build": "webpack --mode production",
     "test": "jest",
     "test:watch": "jest --watch",
     "prepublishOnly": "npm run test && npm run build",
     "start": "webpack serve --mode development",
     "dev": "webpack serve --mode development",
-    "build:example": "webpack --mode production"
+    "build:example": "webpack --mode production",
+    "prepare": "npm run build"
   },
   "keywords": [
     "react",
