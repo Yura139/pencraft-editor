@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions: write-all
 
     steps:
       - uses: actions/checkout@v2
@@ -19,8 +20,15 @@ jobs:
           node-version: "16.x"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Check npm and node versions
+        run: |
+          node --version
+          npm --version
+
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm list --depth=0
 
       - name: Build
         run: npm run build

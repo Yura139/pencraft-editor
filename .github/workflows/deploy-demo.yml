@@ -7,6 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions: write-all
 
     steps:
       - uses: actions/checkout@v2
@@ -16,8 +17,15 @@ jobs:
         with:
           node-version: "16.x"
 
+      - name: Check npm and node versions
+        run: |
+          node --version
+          npm --version
+
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm list --depth=0
 
       - name: Build demo
         run: npm run build:example
@@ -27,3 +35,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          force_orphan: true
