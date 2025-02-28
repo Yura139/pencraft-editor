@@ -7,7 +7,7 @@ module.exports = (env, argv) => {
   const publicPath = isProduction ? "/pencraft-editor/" : "/"
 
   return {
-    entry: isProduction ? "./src/example/App.tsx" : "./src/index.tsx",
+    entry: "./src/index.tsx",
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: "bundle.js",

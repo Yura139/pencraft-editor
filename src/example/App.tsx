@@ -2,8 +2,6 @@ import React from "react"
 import { PencraftEditor } from "../components/PencraftEditor"
 
 export const App: React.FC = () => {
-  console.log("App component rendering")
-
   const handleChange = (content: string) => {
     console.log("Content changed:", content)
   }
