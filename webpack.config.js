@@ -18,7 +18,12 @@ module.exports = (env, argv) => {
       rules: [
         {
           test: /\.(ts|tsx)$/,
-          use: "babel-loader",
+          use: {
+            loader: "babel-loader",
+            options: {
+              presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
+            },
+          },
           exclude: /node_modules/,
         },
         {
@@ -45,7 +50,7 @@ module.exports = (env, argv) => {
       hot: true,
       open: true,
     },
-    devtool: isProduction ? "source-map" : "inline-source-map",
+    devtool: false,
     optimization: {
       minimize: isProduction,
       minimizer: isProduction
@@ -54,6 +59,9 @@ module.exports = (env, argv) => {
               terserOptions: {
                 format: {
                   comments: false,
+                },
+                compress: {
+                  drop_console: true,
                 },
               },
               extractComments: false,
