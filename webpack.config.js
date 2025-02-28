@@ -44,5 +44,6 @@ module.exports = (env, argv) => {
       hot: true,
       open: true,
     },
+    devtool: isProduction ? "source-map" : "eval-source-map",
   }
 }
