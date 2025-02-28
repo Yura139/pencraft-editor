@@ -8,27 +8,29 @@ import { History } from "../utils/History"
 import { ImagePlugin } from "../plugins/ImagePlugin"
 import { LinkPlugin } from "../plugins/LinkPlugin"
 import { TablePlugin } from "../plugins/TablePlugin"
-import { CodePlugin } from "../plugins/CodePlugin"
 import { ListPlugin } from "../plugins/ListPlugin"
 import { HTMLPlugin } from "../plugins/HTMLPlugin"
+import { ShortcutManager } from "../utils/Shortcuts"
+
+// Додаємо стандартні елементи панелі інструментів
+const defaultToolbarItems = [
+  { name: "Bold", command: "bold", icon: "B" },
+  { name: "Italic", command: "italic", icon: "I" },
+  { name: "Underline", command: "underline", icon: "U" },
+  { name: "Strike", command: "strikeThrough", icon: "S" },
+  { name: "p", command: "formatBlock", value: "p", icon: "p" },
+  { name: "H1", command: "formatBlock", value: "h1", icon: "H1" },
+  { name: "H2", command: "formatBlock", value: "h2", icon: "H2" },
+  { name: "H3", command: "formatBlock", value: "h3", icon: "H3" },
+  { name: "Quote", command: "formatBlock", value: "blockquote", icon: "❝" },
+]
 
 export const PencraftEditor = forwardRef<EditorRef, EditorProps>((props, ref) => {
   const {
     initialContent = "",
     onChange,
-    settings = {
-      readOnly: false,
-      spellCheck: true,
-      placeholder: "Start typing...",
-      allowPaste: true,
-      toolbar: {
-        fixed: true,
-        show: true,
-        position: "top",
-      },
-      maxLength: undefined,
-    },
-    toolbarItems = [],
+    settings: userSettings = {},
+    toolbarItems = defaultToolbarItems || props.toolbarItems, // Використовуємо стандартні елементи за замовчуванням
   } = props
 
   const editorRef = useRef<HTMLDivElement>(null) as MutableRefObject<HTMLDivElement>
@@ -37,10 +39,67 @@ export const PencraftEditor = forwardRef<EditorRef, EditorProps>((props, ref) =>
   const [pluginManager, setPluginManager] = useState<PluginManager | null>(null)
   const [isHTMLMode, setIsHTMLMode] = useState(false)
   const [currentTheme, setCurrentTheme] = useState<Theme>(defaultThemes[0])
+  const [shortcutManager] = useState(() => new ShortcutManager())
 
   useEffect(() => {
     if (editorRef.current) {
-      editorRef.current.innerHTML = initialContent
+      const cleanupContent = (content: string) => {
+        const tempDiv = document.createElement("div")
+        tempDiv.innerHTML = content
+
+        const cleanupFormats = (element: HTMLElement) => {
+          const style = element.style
+
+          if (style.fontWeight === "bold" || style.fontWeight === "700") {
+            const strong = document.createElement("strong")
+            strong.innerHTML = element.innerHTML
+            element.parentNode?.replaceChild(strong, element)
+          }
+
+          if (style.fontStyle === "italic") {
+            const em = document.createElement("em")
+            em.innerHTML = element.innerHTML
+            element.parentNode?.replaceChild(em, element)
+          }
+
+          if (style.textDecoration === "underline") {
+            const u = document.createElement("u")
+            u.innerHTML = element.innerHTML
+            element.parentNode?.replaceChild(u, element)
+          }
+
+          if (style.textDecoration === "line-through") {
+            const strike = document.createElement("strike")
+            strike.innerHTML = element.innerHTML
+            element.parentNode?.replaceChild(strike, element)
+          }
+
+          element.removeAttribute("style")
+
+          Array.from(element.children).forEach((child) => {
+            if (child instanceof HTMLElement) {
+              cleanupFormats(child)
+            }
+          })
+        }
+
+        cleanupFormats(tempDiv)
+        return tempDiv.innerHTML
+      }
+
+      if (initialContent) {
+        if (!/<[a-z][\s\S]*>/i.test(initialContent)) {
+          editorRef.current.innerHTML = `<p>${initialContent}</p>`
+        } else {
+          editorRef.current.innerHTML = cleanupContent(initialContent)
+        }
+      } else {
+        // Встановлюємо порожній параграф за замовчуванням
+        editorRef.current.innerHTML = "<p><br></p>"
+      }
+
+      // Встановлюємо параграф як активний блок за замовчуванням
+      document.execCommand("defaultParagraphSeparator", false, "p")
     }
   }, [initialContent])
 
@@ -110,14 +169,107 @@ export const PencraftEditor = forwardRef<EditorRef, EditorProps>((props, ref) =>
       toggleHTMLMode: () => setIsHTMLMode((prev) => !prev),
     }
 
-    const manager = new PluginManager(editorCore)
-    manager.register(new ImagePlugin())
-    manager.register(new LinkPlugin())
-    manager.register(new TablePlugin())
-    manager.register(new CodePlugin())
-    manager.register(new ListPlugin())
-    manager.register(new HTMLPlugin())
+    const manager = new PluginManager(editorCore, shortcutManager)
+    const plugins = [new ListPlugin(), new ImagePlugin(), new LinkPlugin(), new TablePlugin(), new HTMLPlugin()]
+    plugins.forEach((plugin) => manager.register(plugin))
+
     setPluginManager(manager)
+
+    return () => manager.destroy()
+  }, [])
+
+  useEffect(() => {
+    const shortcutManager = new ShortcutManager()
+
+    // Додаємо базові клавіатурні скорочення
+    shortcutManager.register({
+      key: "b",
+      ctrl: true,
+      description: "Bold",
+      handler: (e) => {
+        e.preventDefault()
+        document.execCommand("bold", false)
+      },
+    })
+
+    shortcutManager.register({
+      key: "i",
+      ctrl: true,
+      description: "Italic",
+      handler: (e) => {
+        e.preventDefault()
+        document.execCommand("italic", false)
+      },
+    })
+
+    shortcutManager.register({
+      key: "u",
+      ctrl: true,
+      description: "Underline",
+      handler: (e) => {
+        e.preventDefault()
+        document.execCommand("underline", false)
+      },
+    })
+
+    // Додаємо обробник для клавіатурних скорочень
+    const handleKeyboardShortcuts = (e: KeyboardEvent) => {
+      shortcutManager.handleKeyDown(e)
+    }
+
+    document.addEventListener("keydown", handleKeyboardShortcuts)
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyboardShortcuts)
+      shortcutManager.destroy()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (editorRef.current) {
+      // Функція для обробки комбінованого форматування
+      const handleCombinedFormatting = (e: InputEvent) => {
+        if (!editorRef.current) return
+
+        // Знаходимо всі елементи зі стилями
+        const elementsWithStyle = editorRef.current.querySelectorAll("[style]")
+
+        elementsWithStyle.forEach((element) => {
+          const style = (element as HTMLElement).style
+
+          // Обробляємо комбінації форматування
+          if (style.fontStyle === "italic") {
+            const em = document.createElement("em")
+            em.innerHTML = element.innerHTML
+            // Зберігаємо інші форматування
+            if (element.hasAttribute("class")) em.setAttribute("class", element.getAttribute("class")!)
+            if (element instanceof HTMLElement) {
+              if (element.tagName === "U") {
+                const u = document.createElement("u")
+                u.appendChild(em)
+                element.parentNode?.replaceChild(u, element)
+              } else if (element.tagName === "STRIKE") {
+                const strike = document.createElement("strike")
+                strike.appendChild(em)
+                element.parentNode?.replaceChild(strike, element)
+              } else {
+                element.parentNode?.replaceChild(em, element)
+              }
+            }
+          }
+
+          // Видаляємо всі inline стилі
+          element.removeAttribute("style")
+        })
+      }
+
+      // Додаємо слухач подій для обробки змін в редакторі
+      editorRef.current.addEventListener("input", handleCombinedFormatting as EventListener)
+
+      return () => {
+        editorRef.current?.removeEventListener("input", handleCombinedFormatting as EventListener)
+      }
+    }
   }, [])
 
   useImperativeHandle(ref, () => ({
@@ -178,31 +330,83 @@ export const PencraftEditor = forwardRef<EditorRef, EditorProps>((props, ref) =>
       onChange?.(newContent)
 
       if (wasChanged || newContent !== content) {
-        history.push({ content: newContent })
+        history.push({
+          content: newContent,
+          type: "character",
+        })
       }
     }
   }
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-    if (settings.allowPaste === false) {
+    if (userSettings.allowPaste === false) {
       e.preventDefault()
       return
     }
 
-    if (settings.maxLength) {
+    if (userSettings.maxLength) {
       const content = editorRef.current?.innerText || ""
       const pastedText = e.clipboardData.getData("text") || ""
 
-      if (content.length + pastedText.length > settings.maxLength) {
+      if (content.length + pastedText.length > userSettings.maxLength) {
         e.preventDefault()
         return
       }
     }
 
+    // Отримуємо HTML контент, якщо він є
+    const pastedHtml = e.clipboardData.getData("text/html")
     const pastedText = e.clipboardData.getData("text/plain")
-    if (pastedText && !e.clipboardData.getData("text/html")) {
-      e.preventDefault()
 
+    if (pastedHtml) {
+      e.preventDefault()
+      // Очищуємо HTML від небажаних стилів
+      const tempDiv = document.createElement("div")
+      tempDiv.innerHTML = pastedHtml
+
+      // Замінюємо стильове форматування на семантичні теги
+      const cleanupFormats = (element: HTMLElement) => {
+        const style = element.style
+
+        if (style.fontWeight === "bold" || style.fontWeight === "700") {
+          const strong = document.createElement("strong")
+          strong.innerHTML = element.innerHTML
+          element.parentNode?.replaceChild(strong, element)
+        }
+
+        if (style.fontStyle === "italic") {
+          const em = document.createElement("em")
+          em.innerHTML = element.innerHTML
+          element.parentNode?.replaceChild(em, element)
+        }
+
+        if (style.textDecoration === "underline") {
+          const u = document.createElement("u")
+          u.innerHTML = element.innerHTML
+          element.parentNode?.replaceChild(u, element)
+        }
+
+        if (style.textDecoration === "line-through") {
+          const strike = document.createElement("strike")
+          strike.innerHTML = element.innerHTML
+          element.parentNode?.replaceChild(strike, element)
+        }
+
+        // Видаляємо всі inline стилі
+        element.removeAttribute("style")
+
+        // Рекурсивно обробляємо всі дочірні елементи
+        Array.from(element.children).forEach((child) => {
+          if (child instanceof HTMLElement) {
+            cleanupFormats(child)
+          }
+        })
+      }
+
+      cleanupFormats(tempDiv)
+      document.execCommand("insertHTML", false, tempDiv.innerHTML)
+    } else if (pastedText) {
+      e.preventDefault()
       const paragraphs = pastedText
         .split(/\n\s*\n/)
         .map((text) => `<p>${text.trim() || "<br>"}</p>`)
@@ -211,20 +415,6 @@ export const PencraftEditor = forwardRef<EditorRef, EditorProps>((props, ref) =>
       document.execCommand("insertHTML", false, paragraphs)
     }
   }
-
-  useEffect(() => {
-    if (editorRef.current) {
-      if (initialContent) {
-        if (!/<[a-z][\s\S]*>/i.test(initialContent)) {
-          editorRef.current.innerHTML = `<p>${initialContent}</p>`
-        } else {
-          editorRef.current.innerHTML = initialContent
-        }
-      } else {
-        editorRef.current.innerHTML = ""
-      }
-    }
-  }, [initialContent])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -239,41 +429,56 @@ export const PencraftEditor = forwardRef<EditorRef, EditorProps>((props, ref) =>
       const listItem = currentNode.nodeType === Node.TEXT_NODE ? currentNode.parentElement?.closest("li") : (currentNode as HTMLElement).closest("li")
 
       if (listItem) {
-        const isEmpty = listItem.textContent?.trim() === ""
-        const list = listItem.parentElement
-
-        if (isEmpty && list) {
-          if (listItem.previousElementSibling) {
+        if (!listItem.textContent?.trim()) {
+          const parentList = listItem.parentNode
+          if (parentList) {
+            const newParagraph = document.createElement("p")
+            newParagraph.innerHTML = "<br>"
+            parentList.parentNode?.insertBefore(newParagraph, parentList.nextSibling)
             listItem.remove()
 
-            if (!list.querySelector("li")) {
-              list.remove()
-            }
-
-            const p = document.createElement("p")
-            p.innerHTML = "<br>"
-
-            if (list.nextSibling) {
-              list.parentNode?.insertBefore(p, list.nextSibling)
-            } else {
-              list.parentNode?.appendChild(p)
-            }
-
-            range.selectNodeContents(p)
+            range.selectNodeContents(newParagraph)
             range.collapse(true)
             selection.removeAllRanges()
             selection.addRange(range)
           }
         } else {
-          const newLi = document.createElement("li")
-          newLi.innerHTML = "<br>"
+          const isEmpty = listItem.textContent?.trim() === ""
+          const list = listItem.parentElement
 
-          listItem.parentNode?.insertBefore(newLi, listItem.nextSibling)
+          if (isEmpty && list) {
+            if (listItem.previousElementSibling) {
+              listItem.remove()
 
-          range.selectNodeContents(newLi)
-          range.collapse(true)
-          selection.removeAllRanges()
-          selection.addRange(range)
+              if (!list.querySelector("li")) {
+                list.remove()
+              }
+
+              const p = document.createElement("p")
+              p.innerHTML = "<br>"
+
+              if (list.nextSibling) {
+                list.parentNode?.insertBefore(p, list.nextSibling)
+              } else {
+                list.parentNode?.appendChild(p)
+              }
+
+              range.selectNodeContents(p)
+              range.collapse(true)
+              selection.removeAllRanges()
+              selection.addRange(range)
+            }
+          } else {
+            const newLi = document.createElement("li")
+            newLi.innerHTML = "<br>"
+
+            listItem.parentNode?.insertBefore(newLi, listItem.nextSibling)
+
+            range.selectNodeContents(newLi)
+            range.collapse(true)
+            selection.removeAllRanges()
+            selection.addRange(range)
+          }
         }
       } else {
         const currentBlock = currentNode.nodeType === Node.TEXT_NODE ? currentNode.parentElement : (currentNode as HTMLElement)
@@ -317,11 +522,11 @@ export const PencraftEditor = forwardRef<EditorRef, EditorProps>((props, ref) =>
 
   return (
     <div className="pencraft-container" data-theme={currentTheme.name.toLowerCase()}>
-      <div className={`pencraft-toolbar ${settings.toolbar?.fixed ? "fixed" : ""}`}>
+      <div className={`pencraft-toolbar ${userSettings.toolbar?.fixed ? "fixed" : ""}`}>
         <Toolbar items={[...toolbarItems, ...(pluginManager?.getAllToolbarItems() || [])]} editorRef={editorRef} />
         <ThemeSelector onThemeChange={setCurrentTheme} currentTheme={currentTheme.name} />
       </div>
-      <div ref={editorRef} className={`pencraft-editor ${isHTMLMode ? "html-mode" : ""}`} contentEditable={!settings.readOnly} onInput={handleInput} onKeyDown={handleKeyDown} onPaste={handlePaste} data-placeholder={settings.placeholder} spellCheck={settings.spellCheck} suppressContentEditableWarning />
+      <div ref={editorRef} className={`pencraft-editor ${isHTMLMode ? "html-mode" : ""}`} contentEditable={!userSettings.readOnly} onInput={handleInput} onKeyDown={handleKeyDown} onPaste={handlePaste} data-placeholder={userSettings.placeholder} spellCheck={userSettings.spellCheck} suppressContentEditableWarning />
     </div>
   )
 })

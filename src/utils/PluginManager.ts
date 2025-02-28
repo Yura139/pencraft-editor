@@ -1,35 +1,45 @@
 import { Plugin, EditorCore } from '../types';
+import { ShortcutManager } from './Shortcuts';
 
 export class PluginManager {
   private plugins: Map<string, Plugin> = new Map();
   private editor: EditorCore;
+  private shortcutManager: ShortcutManager;
 
-  constructor(editor: EditorCore) {
+  constructor(editor: EditorCore, shortcutManager: ShortcutManager) {
     this.editor = editor;
+    this.shortcutManager = shortcutManager;
   }
 
-  register(plugin: Plugin) {
+  /**
+   * Реєструє новий плагін
+   * @param plugin Плагін для реєстрації
+   */
+  register(plugin: Plugin): void {
     if (this.plugins.has(plugin.name)) {
       console.warn(`Plugin ${plugin.name} is already registered`);
       return;
     }
 
-    plugin.initialize(this.editor);
+    plugin.initialize(this.editor, this.shortcutManager);
     this.plugins.set(plugin.name, plugin);
   }
 
-  unregister(pluginName: string) {
+  /**
+   * Видаляє зареєстрований плагін
+   * @param pluginName Назва плагіна для видалення
+   */
+  unregister(pluginName: string): void {
     const plugin = this.plugins.get(pluginName);
-    if (plugin && plugin.destroy) {
+    if (plugin?.destroy) {
       plugin.destroy();
     }
     this.plugins.delete(pluginName);
   }
 
-  getPlugin(name: string): Plugin | undefined {
-    return this.plugins.get(name);
-  }
-
+  /**
+   * Повертає всі елементи тулбару від зареєстрованих плагінів
+   */
   getAllToolbarItems() {
     const items: any[] = [];
     this.plugins.forEach(plugin => {
@@ -40,7 +50,10 @@ export class PluginManager {
     return items;
   }
 
-  destroy() {
+  /**
+   * Очищує всі зареєстровані плагіни
+   */
+  destroy(): void {
     this.plugins.forEach(plugin => {
       if (plugin.destroy) {
         plugin.destroy();

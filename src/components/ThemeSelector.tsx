@@ -1,17 +1,7 @@
 import React from "react"
+import { Theme } from "../types"
 
-export interface Theme {
-  name: string
-  styles: {
-    backgroundColor: string
-    textColor: string
-    toolbarBackground: string
-    borderColor: string
-    accentColor: string
-  }
-}
-
-const defaultThemes: Theme[] = [
+export const defaultThemes: Theme[] = [
   {
     name: "Light",
     styles: {
@@ -69,5 +59,3 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ onThemeChange, cur
     </select>
   )
 }
-
-export { defaultThemes }

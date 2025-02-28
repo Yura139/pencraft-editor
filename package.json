@@ -7,6 +7,7 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@types/jest": "^29.5.14",
+    "@types/lodash": "^4.17.15",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "babel-jest": "^29.7.0",
@@ -24,11 +25,12 @@
     "webpack-dev-server": "^5.2.0"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "lodash": "^4.17.21",
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
   },
   "name": "pencraft-editor",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "A lightweight and extensible WYSIWYG editor for React",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -141,18 +141,6 @@ function MyEditor() {
 }
 ```
 
-### Code Plugin
-```tsx
-import { PencraftEditor, CodePlugin } from 'pencraft-editor';
-
-function MyEditor() {
-  return (
-    <PencraftEditor
-      plugins={[new CodePlugin()]}
-    />
-  );
-}
-```
 
 ## Themes
 

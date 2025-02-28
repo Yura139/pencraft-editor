@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { ShortcutManager } from '../utils/Shortcuts';
 
 // Базові типи для редактора
 export interface EditorProps {
@@ -8,11 +9,26 @@ export interface EditorProps {
   toolbarItems?: ToolbarItem[];
 }
 
-export interface EditorRef {
+// Базовий інтерфейс для спільних методів
+interface BaseEditorInterface {
   getContent: () => string;
   setContent: (content: string) => void;
   focus: () => void;
   blur: () => void;
+}
+
+// Розширюємо базовий інтерфейс для EditorRef
+export interface EditorRef extends BaseEditorInterface {
+  // EditorRef не потребує додаткових методів
+}
+
+// Розширюємо базовий інтерфейс для EditorCore
+export interface EditorCore extends BaseEditorInterface {
+  insertHTML: (html: string) => void;
+  undo: () => void;
+  redo: () => void;
+  isHTMLMode: () => boolean;
+  toggleHTMLMode: () => void;
 }
 
 // Типи для тулбару
@@ -21,34 +37,20 @@ export interface ToolbarProps {
   editorRef: React.MutableRefObject<HTMLDivElement>;
 }
 
-export interface ToolbarItemProps {
-  onClick: () => void;
-}
-
 export interface ToolbarItem {
   name: string;
-  icon: string;
   command?: string;
   value?: string;
-  action?: (editor: HTMLDivElement) => void;
-  render?: () => React.ReactNode;
-}
-
-export interface EditorCore {
-  getContent: () => string;
-  setContent: (content: string) => void;
-  insertHTML: (html: string) => void;
-  focus: () => void;
-  blur: () => void;
-  undo: () => void;
-  redo: () => void;
-  isHTMLMode: () => boolean;
-  toggleHTMLMode: () => void;
+  icon: ReactNode;
+  action?: (editor: HTMLElement) => void;
+  render?: () => ReactNode;
+  isActive?: boolean;
+  checkActive?: (editor: HTMLElement) => boolean;
 }
 
 export interface Plugin {
   name: string;
-  initialize: (editor: EditorCore) => void;
+  initialize: (editor: EditorCore, shortcutManager: ShortcutManager) => void;
   destroy?: () => void;
   toolbar?: ToolbarItem[];
 }

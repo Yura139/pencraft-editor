@@ -1,15 +1,17 @@
-import React, { useState } from "react"
+import React from "react"
 import { Plugin, EditorCore } from "../types"
 import { Modal } from "../components/Modal"
+import { SelectionManager } from "../utils/SelectionManager"
 
+// Виносимо компонент діалогу окремо
 const LinkDialog: React.FC<{
   isOpen: boolean
   onClose: () => void
   onInsert: (url: string, text: string) => void
   initialText: string
 }> = ({ isOpen, onClose, onInsert, initialText }) => {
-  const [url, setUrl] = useState("")
-  const [text, setText] = useState("")
+  const [url, setUrl] = React.useState("")
+  const [text, setText] = React.useState("")
 
   React.useEffect(() => {
     setText(initialText)
@@ -37,30 +39,24 @@ const LinkDialog: React.FC<{
   )
 }
 
+// Виносимо компонент кнопки окремо
+const LinkButton: React.FC<{
+  onButtonClick: () => void
+}> = ({ onButtonClick }) => {
+  return (
+    <button className="pencraft-button" onClick={onButtonClick} title="Insert link">
+      🔗
+    </button>
+  )
+}
+
 export class LinkPlugin implements Plugin {
   name = "link"
   private editor: EditorCore | null = null
-  private savedRange: Range | null = null
+  private selectionManager: SelectionManager = new SelectionManager()
 
   initialize(editor: EditorCore) {
     this.editor = editor
-  }
-
-  private saveSelection = () => {
-    const selection = window.getSelection()
-    if (selection && selection.rangeCount > 0) {
-      this.savedRange = selection.getRangeAt(0).cloneRange()
-    }
-  }
-
-  private restoreSelection = () => {
-    if (this.savedRange) {
-      const selection = window.getSelection()
-      if (selection) {
-        selection.removeAllRanges()
-        selection.addRange(this.savedRange)
-      }
-    }
   }
 
   private insertLink = (url: string, text: string) => {
@@ -68,53 +64,14 @@ export class LinkPlugin implements Plugin {
 
     try {
       new URL(url)
-      this.restoreSelection()
+      const editorElement = document.querySelector(".pencraft-editor") as HTMLElement
+      if (!editorElement) return
 
-      const selection = window.getSelection()
-      if (!selection || !selection.rangeCount) return
-
-      const range = selection.getRangeAt(0)
-      const editorElement = document.querySelector(".pencraft-editor")
-
-      // Перевіряємо, чи знаходимося в редакторі
-      if (!editorElement?.contains(range.commonAncestorContainer)) {
-        return
-      }
-
-      // Створюємо посилання
-      const link = document.createElement("a") as HTMLAnchorElement
-      link.href = url
-      link.target = "_blank"
-      link.rel = "noopener noreferrer"
-      link.textContent = text
-
-      // Очищаємо вміст діапазону і вставляємо посилання
-      range.deleteContents()
-      range.insertNode(link)
-
-      // Переміщуємо курсор після посилання
-      range.setStartAfter(link)
-      range.setEndAfter(link)
-      selection.removeAllRanges()
-      selection.addRange(range)
-
-      // Перевіряємо, чи посилання знаходиться в параграфі
-      let currentNode: Node = link
-      while (currentNode.parentElement && currentNode.parentElement !== editorElement) {
-        currentNode = currentNode.parentElement
-      }
-
-      // Якщо посилання не в параграфі, обгортаємо його
-      if (currentNode === link) {
-        const p = document.createElement("p")
-        link.parentNode?.insertBefore(p, link)
-        p.appendChild(link)
-      }
+      const link = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`
+      this.selectionManager.insertHTML(link, editorElement)
 
       // Створюємо подію input для оновлення стану
       editorElement.dispatchEvent(new Event("input", { bubbles: true }))
-
-      this.savedRange = null
     } catch (error) {
       alert("Please enter a valid URL")
     }
@@ -125,27 +82,31 @@ export class LinkPlugin implements Plugin {
       name: "Link",
       icon: "🔗",
       render: () => {
-        const [isOpen, setIsOpen] = useState(false)
-        const [selectedText, setSelectedText] = useState("")
-
-        return (
-          <>
-            <button
-              className="pencraft-button"
-              onClick={() => {
-                this.saveSelection()
-                const selection = window.getSelection()
-                setSelectedText(selection?.toString() || "")
-                setIsOpen(true)
-              }}
-              title="Insert link"
-            >
-              🔗
-            </button>
-            <LinkDialog isOpen={isOpen} onClose={() => setIsOpen(false)} onInsert={this.insertLink} initialText={selectedText} />
-          </>
-        )
+        return <LinkToolbarItem onInsert={this.insertLink} onSaveSelection={() => this.selectionManager.saveSelection()} />
       },
     },
   ]
+}
+
+// Створюємо окремий компонент для елемента тулбару
+const LinkToolbarItem: React.FC<{
+  onInsert: (url: string, text: string) => void
+  onSaveSelection: () => void
+}> = ({ onInsert, onSaveSelection }) => {
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [selectedText, setSelectedText] = React.useState("")
+
+  return (
+    <>
+      <LinkButton
+        onButtonClick={() => {
+          onSaveSelection()
+          const selection = window.getSelection()
+          setSelectedText(selection?.toString() || "")
+          setIsOpen(true)
+        }}
+      />
+      <LinkDialog isOpen={isOpen} onClose={() => setIsOpen(false)} onInsert={onInsert} initialText={selectedText} />
+    </>
+  )
 }
