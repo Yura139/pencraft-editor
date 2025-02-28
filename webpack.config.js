@@ -1,5 +1,6 @@
 const path = require("path")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const TerserPlugin = require("terser-webpack-plugin")
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === "production"
@@ -44,6 +45,21 @@ module.exports = (env, argv) => {
       hot: true,
       open: true,
     },
-    devtool: isProduction ? "source-map" : "eval-source-map",
+    devtool: isProduction ? "source-map" : "inline-source-map",
+    optimization: {
+      minimize: isProduction,
+      minimizer: isProduction
+        ? [
+            new TerserPlugin({
+              terserOptions: {
+                format: {
+                  comments: false,
+                },
+              },
+              extractComments: false,
+            }),
+          ]
+        : [],
+    },
   }
 }
