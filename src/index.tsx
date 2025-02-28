@@ -11,7 +11,6 @@ if (!container) {
 const root = createRoot(container)
 root.render(
   <React.StrictMode>
-    <h2>555</h2>
     <App />
   </React.StrictMode>
 )

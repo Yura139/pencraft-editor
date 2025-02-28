@@ -10,7 +10,7 @@ export const App: React.FC = () => {
     <div style={{ padding: "60px 120px", maxWidth: "1920px", margin: "0 auto" }}>
       <h1>Pencraft Editor Example</h1>
       <PencraftEditor
-        initialContent="Test content"
+        initialContent=""
         onChange={handleChange}
         settings={{
           placeholder: "Start typing...",
