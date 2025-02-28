@@ -10,6 +10,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, "dist"),
       filename: "bundle.js",
       publicPath: isProduction ? "/pencraft-editor/" : "/",
+      clean: true,
     },
     module: {
       rules: [
