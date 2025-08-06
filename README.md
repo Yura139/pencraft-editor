@@ -51,7 +51,7 @@ yarn add pencraft-editor
 **Important:** Don't forget to import the CSS styles in your application:
 
 ```tsx
-import 'pencraft-editor/src/styles/editor.css';
+import 'pencraft-editor/dist/editor.css';
 ```
 
 You can import the styles in your main CSS file or directly in your component.
@@ -60,7 +60,7 @@ You can import the styles in your main CSS file or directly in your component.
 
 ```tsx
 import { PencraftEditor } from 'pencraft-editor';
-import 'pencraft-editor/src/styles/editor.css'; // Імпортуйте стилі
+import 'pencraft-editor/dist/editor.css'; // Імпортуйте стилі
 
 function MyEditor() {
   const handleChange = (content: string) => {
@@ -127,7 +127,7 @@ Pencraft Editor comes with several built-in plugins:
 ### Image Plugin
 ```tsx
 import { PencraftEditor, ImagePlugin } from 'pencraft-editor';
-import 'pencraft-editor/src/styles/editor.css';
+import 'pencraft-editor/dist/editor.css';
 
 function MyEditor() {
   return (
@@ -141,7 +141,7 @@ function MyEditor() {
 ### Table Plugin
 ```tsx
 import { PencraftEditor, TablePlugin } from 'pencraft-editor';
-import 'pencraft-editor/src/styles/editor.css';
+import 'pencraft-editor/dist/editor.css';
 
 function MyEditor() {
   return (
@@ -159,7 +159,7 @@ The editor supports custom themes:
 
 ```tsx
 import { PencraftEditor, Theme } from 'pencraft-editor';
-import 'pencraft-editor/src/styles/editor.css';
+import 'pencraft-editor/dist/editor.css';
 
 const customTheme: Theme = {
   name: "Custom",
@@ -190,7 +190,7 @@ Access editor methods using ref:
 ```tsx
 import React, { useRef } from 'react';
 import { PencraftEditor, EditorRef } from 'pencraft-editor';
-import 'pencraft-editor/src/styles/editor.css';
+import 'pencraft-editor/dist/editor.css';
 
 function MyEditor() {
   const editorRef = useRef<EditorRef>(null);

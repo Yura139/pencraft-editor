@@ -1,5 +1,12 @@
 {
   "extends": "./tsconfig.json",
+  "include": [
+    "src/index.ts",
+    "src/components/**/*",
+    "src/plugins/**/*",
+    "src/types/**/*",
+    "src/utils/**/*"
+  ],
   "exclude": [
     "src/**/*.test.tsx",
     "src/**/*.test.ts",
@@ -8,6 +15,7 @@
     "src/__tests__",
     "src/setupTests.ts",
     "src/example",
+    "src/index.tsx",
     "webpack.config.js",
     "webpack.config.lib.js",
     "jest.config.js"
@@ -18,6 +26,9 @@
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   }
 } 
