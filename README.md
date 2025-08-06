@@ -22,7 +22,7 @@ Perfect for:
 - Form Builders
 - And any application requiring rich text editing capabilities
 
-[View Demo](https://your-demo-link.com) | [Documentation](https://your-docs-link.com)
+[View Demo](https://yura139.github.io/pencraft-editor/) | [npm Package](https://www.npmjs.com/package/pencraft-editor)
 
 ![npm](https://img.shields.io/npm/v/pencraft-editor)
 ![License](https://img.shields.io/npm/l/pencraft-editor)
@@ -48,10 +48,19 @@ npm install pencraft-editor
 yarn add pencraft-editor
 ```
 
+**Important:** Don't forget to import the CSS styles in your application:
+
+```tsx
+import 'pencraft-editor/src/styles/editor.css';
+```
+
+You can import the styles in your main CSS file or directly in your component.
+
 ## Basic Usage
 
 ```tsx
 import { PencraftEditor } from 'pencraft-editor';
+import 'pencraft-editor/src/styles/editor.css'; // Імпортуйте стилі
 
 function MyEditor() {
   const handleChange = (content: string) => {
@@ -118,6 +127,7 @@ Pencraft Editor comes with several built-in plugins:
 ### Image Plugin
 ```tsx
 import { PencraftEditor, ImagePlugin } from 'pencraft-editor';
+import 'pencraft-editor/src/styles/editor.css';
 
 function MyEditor() {
   return (
@@ -131,6 +141,7 @@ function MyEditor() {
 ### Table Plugin
 ```tsx
 import { PencraftEditor, TablePlugin } from 'pencraft-editor';
+import 'pencraft-editor/src/styles/editor.css';
 
 function MyEditor() {
   return (
@@ -148,6 +159,7 @@ The editor supports custom themes:
 
 ```tsx
 import { PencraftEditor, Theme } from 'pencraft-editor';
+import 'pencraft-editor/src/styles/editor.css';
 
 const customTheme: Theme = {
   name: "Custom",
@@ -176,7 +188,9 @@ function MyEditor() {
 Access editor methods using ref:
 
 ```tsx
+import React, { useRef } from 'react';
 import { PencraftEditor, EditorRef } from 'pencraft-editor';
+import 'pencraft-editor/src/styles/editor.css';
 
 function MyEditor() {
   const editorRef = useRef<EditorRef>(null);
@@ -224,7 +238,14 @@ class CustomPlugin implements Plugin {
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request on [GitHub](https://github.com/Yura139/pencraft-editor).
+
+## Useful Links
+
+- 📦 [npm Package](https://www.npmjs.com/package/pencraft-editor)
+- 🌐 [Live Demo](https://yura139.github.io/pencraft-editor/)
+- 💻 [GitHub Repository](https://github.com/Yura139/pencraft-editor)
+- 📋 [Issues & Bug Reports](https://github.com/Yura139/pencraft-editor/issues)
 
 ## License
 

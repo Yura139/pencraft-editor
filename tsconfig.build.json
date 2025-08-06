@@ -7,10 +7,17 @@
     "src/**/*.spec.ts",
     "src/__tests__",
     "src/setupTests.ts",
-    "src/example"
+    "src/example",
+    "webpack.config.js",
+    "webpack.config.lib.js",
+    "jest.config.js"
   ],
   "compilerOptions": {
-    "outDir": "dist",
-    "declaration": true
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "skipLibCheck": true
   }
 } 
