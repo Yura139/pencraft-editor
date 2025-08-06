@@ -56,6 +56,8 @@ import 'pencraft-editor/dist/editor.css';
 
 You can import the styles in your main CSS file or directly in your component.
 
+**Note:** The styles are not automatically imported with the component to give you full control over styling and avoid conflicts.
+
 ## Basic Usage
 
 ```tsx

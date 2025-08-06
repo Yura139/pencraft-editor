@@ -2,7 +2,6 @@ import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect, Mu
 import { EditorProps, EditorRef, EditorCore, Theme } from "../types"
 import { Toolbar } from "./Toolbar"
 import { ThemeSelector, defaultThemes } from "./ThemeSelector"
-import "../styles/editor.css"
 import { PluginManager } from "../utils/PluginManager"
 import { History } from "../utils/History"
 import { ImagePlugin } from "../plugins/ImagePlugin"

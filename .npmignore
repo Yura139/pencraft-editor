@@ -1,8 +1,12 @@
-src
-tsconfig.json
-tsconfig.build.json
-jest.config.js
-.babelrc
-.gitignore
-coverage
-node_modules 
+# Виключаємо все окрім dist та README
+*
+!dist/
+!README.md
+!package.json
+
+# Виключаємо проблемні файли навіть якщо вони в dist
+**/*agent-base*
+**/*https-proxy-agent*
+**/*eslint*
+**/*typedoc*
+**/*.tgz 
