@@ -14,6 +14,12 @@ module.exports = {
   externals: {
     react: "react",
     "react-dom": "react-dom",
+    // Виключаємо всі можливі проблемні залежності
+    "agent-base": "commonjs agent-base",
+    "https-proxy-agent": "commonjs https-proxy-agent",
+    eslint: "commonjs eslint",
+    "eslint-config-airbnb": "commonjs eslint-config-airbnb",
+    typedoc: "commonjs typedoc",
   },
   module: {
     rules: [
