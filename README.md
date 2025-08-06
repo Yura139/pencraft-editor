@@ -58,6 +58,25 @@ You can import the styles in your main CSS file or directly in your component.
 
 **Note:** The styles are not automatically imported with the component to give you full control over styling and avoid conflicts.
 
+### Next.js Support
+
+The library supports both ES6 modules and CommonJS, making it compatible with Next.js SSR:
+
+```tsx
+// pages/editor.js or app/editor/page.tsx
+import { PencraftEditor } from 'pencraft-editor';
+import 'pencraft-editor/dist/editor.css';
+
+export default function EditorPage() {
+  return (
+    <PencraftEditor 
+      initialContent="<p>Works with Next.js!</p>"
+      onChange={(content) => console.log(content)}
+    />
+  );
+}
+```
+
 ## Basic Usage
 
 ```tsx
